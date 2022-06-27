@@ -1,12 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const cors = require('cors')
 
 const rotaEndereco = require('./routes/endereco');
 const rotaDenuncia = require('./routes/denuncia');
 const rotaLoguin = require('./routes/loguin_orgao');
 const rotaOrgao = require('./routes/orgao');
 
+app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
