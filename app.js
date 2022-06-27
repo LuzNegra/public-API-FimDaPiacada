@@ -5,6 +5,9 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+const rotaOrgao = require('./routes/orgao');
+app.use('/orgao', rotaOrgao);
+
 app.get('/', (req, res) => {
     res.status(200).json({
       success: true
