@@ -1,0 +1,34 @@
+CREATE DATABASE Fim_Da_Picada;
+USE Fim_Da_Picada;
+CREATE TABLE tb_Endereco (
+id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+cep VARCHAR(9) NOT NULL,
+estado VARCHAR(2) NOT NULL,
+cidade VARCHAR(50) NOT NULL,
+bairro VARCHAR(50) NOT NULL,
+rua VARCHAR(50) NOT NULL,
+numero VARCHAR(12) NOT NULL DEFAULT 'Não possui');
+
+CREATE TABLE tb_Denuncia (
+id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+endereco INT NOT NULL,
+completamento VARCHAR(500) NOT NULL DEFAULT 'Nao possui',
+descricao TEXT NOT NULL,
+protocolo VARCHAR(20) NOT NULL,
+denuncia_status VARCHAR(20) NOT NULL DEFAULT 'Não verificado');
+
+CREATE TABLE tb_orgao (
+id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+nome VARCHAR(50) NOT NULL,
+uf VARCHAR(3) NOT NULL,
+loguin VARCHAR(50) NOT NULL,
+senha VARCHAR(50) NOT NULL);
+
+CREATE TABLE tb_Funcioario (
+id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+nome VARCHAR(50) NOT NULL,
+fone VARCHAR(15) NOT NULL,
+id_orgao INT NOT NULL);
+
+ALTER TABLE tb_Denuncia ADD CONSTRAINT tb_Denuncia_endereco_tb_Endereco_id FOREIGN KEY (endereco) REFERENCES tb_Endereco(id);
+ALTER TABLE tb_Funcioario ADD CONSTRAINT tb_Funcioario_id_orgao_tb_orgao_id FOREIGN KEY (id_orgao) REFERENCES tb_orgao(id);
