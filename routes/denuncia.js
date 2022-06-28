@@ -11,7 +11,7 @@ router.get('/:id_protocolo', (req, res, next) => {
             return res.status(500).send({ error : error})
         }
         conn.query(
-            'SELECT tb_endereco.cep, tb_endereco.estado, tb_endereco.cidade, tb_endereco.bairro, tb_endereco.rua, tb_endereco.numero, tb_denuncia.completamento, tb_denuncia.descricao FROM tb_denuncia INNER JOIN tb_endereco ON tb_denuncia.endereco = tb_endereco.id WHERE tb_denuncia.protocolo = ?',
+            'SELECT tb_endereco.cep, tb_endereco.estado, tb_endereco.cidade, tb_endereco.bairro, tb_endereco.rua, tb_endereco.numero, tb_denuncia.completamento, tb_denuncia.descricao, tb_denuncia.denuncia_status FROM tb_denuncia INNER JOIN tb_endereco ON tb_denuncia.endereco = tb_endereco.id WHERE tb_denuncia.protocolo = ?',
             [req.params.id_protocolo],
             (error, resultado, fields) => {
                 conn.release()
