@@ -1,19 +1,11 @@
 const express = require('express');
 const req = require('express/lib/request');
 const res = require('express/lib/response');
-const db = require('../sql/MySqlite');
 const mySQL = require('../sql/mysqlConfig').pool;
 const router = express.Router();
 const loguin = require('../middleware/loguin');
 
-router.get('/', (req, res) => {
-    res.status(200).json({
-      success: true,
-      rota: "denúncia"
-    })
-})
 router.get('/:id_protocolo', (req, res, next) => {
-    console.log(req.params.id_protocolo);
     mySQL.getConnection((error, conn) => {
         if(error){
             return res.status(500).send({ error : error})
@@ -32,47 +24,61 @@ router.get('/:id_protocolo', (req, res, next) => {
     })
 });
 
-router.get('/buscar/uf', loguin.obrigatorio ,(req, res, next) => {
-    const uf = req.orgao.uf;
-    const sql = 'SELECT descricao, endereco_cep, endereco_num, endereco_rua, endereco_uf, status FROM tb_Denuncia INNER JOIN tb_Endereco ON tb_Endereco.endereco_uf = ? AND tb_Denuncia.status = "Não Verificado"';
-    let result = [];
-    db.all(sql, uf, (err, rows) => {
-        if(err){
-            res.status(500).send({
-                messagem: 'Erro ao procurar a denuncia',
-                error: err
-            })
+router.get('/buscar/:uf', loguin.obrigatorio, (req, res, next) => {
+    mySQL.getConnection((error, conn) => {
+        if(error){
+            return res.status(500).send({ error : error})
         }
-        rows.forEach((row) => {
-            result.push(row);
-        })
-        if(result.length === 0){
-            res.status(200).send({
-                messagem: "Denúncia não encontrado",
-                uf: uf
-            })
-        }else{
-            res.status(200).send({
-                messagem: "Denúncia encontrado",
-                retorno: result
-            })
-        }
+        conn.query(
+            'SELECT cep, cidade, estado, bairro, rua, numero, completamento, descricao FROM tb_denuncia INNER JOIN tb_endereco ON tb_endereco.estado = ? AND tb_denuncia.denuncia_status = "Não Verificado" AND tb_denuncia.endereco = tb_endereco.id',
+            [req.params.uf],
+            (error, resultado, fields) => {
+                conn.release();
+                if(error) {
+                    res.status(500).send({error:error});
+                }
+                if(resultado.length > 0){
+                    return res.status(200).send({retorno : resultado})
+                }else{
+                    return res.status(200).send({retorno : resultado})
+                }
+            }
+        )
     });
 });
 
 router.put('/status/:EnderecoID', loguin.obrigatorio, (req, res, next) => {
-    const sql = 'UPDATE tb_Denuncia set status = "Verificado" WHERE endereco = ? AND status = ?';
-    const parametros = [req.params.EnderecoID, "Não Verificado"]
-    db.run(sql, parametros, err => {
-        if(err){
-            res.status(500).send({
-                messagem: "Erro ao alterar denúncias"
-            })
+    mySQL.getConnection((error, conn) => {
+        if(error){
+            return res.status(500).send({ error : error})
         }
+        console.log(req.params.EnderecoID)
+        conn.query(
+            'UPDATE tb_denuncia set denuncia_status = "Verificado" WHERE endereco = ? AND denuncia_status = "Não verificado"',
+            [req.params.EnderecoID],
+            (error, resultodo, field) => {
+                conn.release();
+                if(error) {
+                    return res.status(500).send({
+                        error : error,
+                        response : null
+                    });
+                }
+                res.status(200).send({
+                    mensagem : 'Status alterado com sucesso'
+                })
+            }
+        )
+    })
+    /*
+    const sql = 'UPDATE tb_Denuncia set status = "Verificado" WHERE endereco = ? AND status = ?';    const parametros = [req.params.EnderecoID, "Não Verificado"]
+    db.run(sql, parametros, err => {        if(err){
+            res.status(500).send({                messagem: "Erro ao alterar denúncias"
+            })        }
         res.status(200).send({
             messagem: "Alteração da denúncia realizada com sucesso para " + parametros[1]
         })
-    });
+    });*/
     
 })
 

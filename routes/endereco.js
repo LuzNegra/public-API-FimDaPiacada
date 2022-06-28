@@ -1,14 +1,6 @@
 const express = require('express');
-const db = require('../sql/MySqlite');
 const router = express.Router();
 const mySQL = require('../sql/mysqlConfig').pool;
-
-router.get('/', (req, res) => {
-    res.status(200).json({
-      success: true,
-      rota: "endereco"
-    })
-})
 
 router.post('/procurar', (req, res, next) => {
     mySQL.getConnection((error, conn) => {
