@@ -67,7 +67,9 @@ router.post('/logar', (req, res, next) => {
                         });
                         return res.status(200).send({
                             message : 'Autenticado com sucesso',
-                            token : token
+                            token : token,
+                            nome : resultodo[0].nome,
+                            estado: resultodo[0].uf
                         });
                     }
                     return res.status(401).send({message : 'Falha na autenticação'})
